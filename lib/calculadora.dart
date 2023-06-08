@@ -63,64 +63,41 @@ void _onClearButtonPressed() {
 
 
   int eval(String expression) {
-    expression = expression.replaceAll(RegExp(r'\s+'), '');
+  expression = expression.replaceAll(RegExp(r'\s+'), '');
 
-    if (expression.startsWith('-')) {
+  if (expression.startsWith('-')) {
     // Remove o sinal de negativo e avalia o restante da expressão
     int result = -eval(expression.substring(1));
     return result;
   }
 
-    if (expression.contains('+') ||
-        expression.contains('-') ||
-        expression.contains('*') ||
-        expression.contains('/')) {
-      List<String>? parts;
-      String? operator;
-      if (expression.contains('+')) {
-        parts = expression.split('+');
-        operator = '+';
-      } else if (expression.contains('-')) {
-        parts = expression.split('-');
-        operator = '-';
-      } else if (expression.contains('*')) {
-        parts = expression.split('*');
-        operator = '*';
-      } else if (expression.contains('/')) {
-        parts = expression.split('/');
-        operator = '/';
-      }
+  List<String> parts = expression.split(RegExp(r'[+\-*/]'));
 
-      if (parts?.length == 2) {
-        try {
-          int operand1 = int.parse(parts![0], radix: 16);
-          int operand2 = int.parse(parts![1], radix: 16);
-
-          if (operator == '+') {
-            return operand1 + operand2;
-          } else if (operator == '-') {
-            return operand1 - operand2;
-          } else if (operator == '*') {
-            return operand1 * operand2;
-          } else if (operator == '/') {
-            return operand1 ~/ operand2;
-          }
-        } catch (e) {
-          throw Exception('Invalid expression');
-        }
-      } else {
-        throw Exception('Invalid expression');
-      }
-    } else {
-      try {
-        return int.parse(expression, radix: 16);
-      } catch (e) {
-        throw Exception('Invalid expression');
-      }
+  List<String> operators = [];
+  expression.split('').forEach((char) {
+    if (char == '+' || char == '-' || char == '*' || char == '/') {
+      operators.add(char);
     }
+  });
 
-    throw Exception('Invalid expression');
+  int result = int.parse(parts[0], radix: 16);
+
+  for (int i = 0; i < operators.length; i++) {
+    int operand = int.parse(parts[i + 1], radix: 16);
+
+    if (operators[i] == '+') {
+      result += operand;
+    } else if (operators[i] == '-') {
+      result -= operand;
+    } else if (operators[i] == '*') {
+      result *= operand;
+    } else if (operators[i] == '/') {
+      result ~/= operand;
+    }
   }
+
+  return result;
+}
 
 @override
 void initState() {
